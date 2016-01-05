@@ -1,0 +1,11 @@
+message ahoJ_SVET
+{
+	uint8 a = 1;
+	uint8 b = 2;
+}
+
+message ahoJ_SET
+{
+	uint8 a = 1;
+	d b = 2;
+}
