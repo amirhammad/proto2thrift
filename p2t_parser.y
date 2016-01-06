@@ -61,6 +61,7 @@ class p2t_driver;
 %token ENUM "enum"
 %token <std::string> NAME
 %type <Message *> contents
+%type <Enum *> enum_fields
 
 %left '+' '-'
 %left '*' '/'
@@ -69,8 +70,16 @@ class p2t_driver;
 %%
 
 file:
-|	file "message" NAME "{" contents "}" { $contents->setName($NAME); $contents->print(); }
-/*|	file "enum" NAME "{" contents "}" { printf("Found enum: %s %s\n", $3.data(), $5.data()); }*/
+|	file "message" NAME "{" contents "}"
+	{
+		$contents->setName($NAME);
+		$contents->print();
+	}
+|	file "enum" NAME "{" enum_fields "}"
+	{
+		$enum_fields->setName($NAME);
+		$enum_fields->print(0);
+	}
 ;
 
 contents: { $$ = new Message(); }
@@ -83,7 +92,25 @@ contents: { $$ = new Message(); }
 		var->setValue($NUMBER);
 		$$->addContent(var);
 	}
+|	contents "enum" NAME "{" enum_fields[c2] "}"
+	{
+		$$ = $1;
+		$c2->setName($NAME);
+		$$->addContent($c2);
+	}
 ;
+
+enum_fields: { $$ = new Enum(); }
+|	enum_fields NAME "=" NUMBER ";"
+{
+	$$ = $1;
+	EnumField *field = new EnumField();
+	field->setName($NAME);
+	field->setValue($NUMBER);
+	$$->addField(field);
+}
+;
+
 %%
 
 yy::p2t_parser::symbol_type yylex(p2t_scanner& scanner, p2t_driver& driver)
@@ -101,6 +128,8 @@ int main(int argc, char const *argv[])
 
 	p2t_scanner scanner(NULL, &std::cerr);
 	yy::p2t_parser parser(scanner, driver);
+/*	scanner.set_debug(1);*/
+/*	parser.set_debug_level(1);*/
 	return parser.parse();
 	        
 /*	driver.parse(argv[0]);*/

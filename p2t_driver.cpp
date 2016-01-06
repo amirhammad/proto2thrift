@@ -37,12 +37,30 @@ int p2t_driver::parse (const std::string &f)
 {
 
 }
-
+/*
+ * type = "double" | "float" | "int32" | "int64" | "uint32" | "uint64"
+	  | "sint32" | "sint64" | "fixed32" | "fixed64" | "sfixed32" | "sfixed64"
+	  | "bool" | "string" | "bytes"
+ */
 const std::map<std::string, std::string> &p2t_driver::typeMap()
 {
 	static const std::map<std::string, std::string> a =
 	{
-		{"uint8", "int"}
+		{"double", "double"},
+		{"float", "float"},
+		{"int32", "i32"},
+		{"sint32", "i32"},
+		{"int64", "i64"},
+		{"sint64", "i64"},
+		{"uint32", "u32"},
+		{"fixed32", "u32"},
+		{"sfixed32", "i32"},
+		{"uint64", "u64"},
+		{"fixed64", "u64"},
+		{"sfixed64", "i64"},
+		{"bool", "bool"},
+		{"string", "string"},
+		{"bytes", "bytes"},
 	};
 	return a;
 }

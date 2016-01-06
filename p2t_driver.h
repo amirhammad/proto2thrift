@@ -42,10 +42,9 @@ public:
 class p2t_scanner : public yyFlexLexer {
 public:
 
-	p2t_scanner(std::istream *in, std::ostream *out) : yyFlexLexer(in, out),
-										yylval(NULL) {
-
-										}
+	p2t_scanner(std::istream *in, std::ostream *out) : yyFlexLexer(in, out)
+	{
+	}
 
 	yy::p2t_parser::symbol_type yylex (p2t_driver& driver);
 

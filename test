@@ -1,11 +1,27 @@
-message ahoJ_SVET
+
+enum childMessage
 {
-	uint8 a = 1;
-	uint8 b = 2;
+	whatever = 1;
+	omg = 2;
 }
 
-message ahoJ_SET
+message numbers
 {
-	uint8 a = 1;
-	d b = 2;
+	enum childMessage
+	{
+		whatever = 1;
+		omg = 2;
+	}
+	uint32 a = 1;
+	uint64 b = 2;
+	uint64 c = 016;
+	string c = 0x1f;
+}
+
+message parentMessage
+{
+	message childMessage {
+		string whatever = 1;
+		string omg = 2;
+	}
 }

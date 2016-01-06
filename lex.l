@@ -37,6 +37,8 @@
 "}"	{ return yy::p2t_parser::make_RBRACE(); }
 "="	{ return yy::p2t_parser::make_EQUAL(); }
 ";"	{ return yy::p2t_parser::make_SEMICOLON(); }
+"0x"[0-9a-fA-F]+	{ return yy::p2t_parser::make_NUMBER(strtol(YYText() + 2, 0, 16)); }
+"0"[0-7]+	{ return yy::p2t_parser::make_NUMBER(strtol(YYText() + 1, 0, 8)); }
 [1-9][0-9]*	{ return yy::p2t_parser::make_NUMBER(strtol(YYText(), 0, 10)); }
 [a-zA-Z]([a-zA-Z0-9_])*	{ return processName(YYText()); }
 .|\n   {}
