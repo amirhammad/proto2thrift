@@ -25,7 +25,6 @@ add_custom_command(
 add_custom_command(
 	OUTPUT
 		"${CMAKE_BINARY_DIR}/${LEXER_SOURCE}.cc"
-
 	COMMAND
 		flex -o ${CMAKE_BINARY_DIR}/${LEXER_SOURCE}.cc ${LEXER_SOURCE}
 	DEPENDS
@@ -52,7 +51,17 @@ SET(CMAKE_CXX_FLAGS "-std=c++0x")
 add_custom_target(
 	p2t
 	ALL
-	DEPENDS p2t_app
-	SOURCES lex.l p2t_parser.y
-	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+	DEPENDS
+		p2t_app
+	SOURCES
+		lex.l
+		p2t_parser.y
+	WORKING_DIRECTORY
+		${CMAKE_SOURCE_DIR}
+)
+install(
+	TARGETS
+		p2t_app
+	DESTINATION
+		/home/amir/Desktop
 )

@@ -126,8 +126,8 @@ public:
 };
 
 class Enum : public Universal {
-	typedef std::shared_ptr<EnumField> contents_type;
-	std::list<contents_type> m_contents;
+	typedef std::shared_ptr<Universal> field_type;
+	std::list<field_type> m_fields;
 	std::string m_name;
 public:
 	Enum()
@@ -136,7 +136,7 @@ public:
 	}
 	virtual ~Enum()
 	{
-		std::list<contents_type>::const_iterator it = m_contents.begin();
+		std::list<field_type>::const_iterator it = m_fields.begin();
 	}
 
 	void setName(const std::string &name)
@@ -148,41 +148,36 @@ public:
 
 	void addField(EnumField *field)
 	{
-		contents_type a(field);
-		m_contents.push_back(a);
+		field_type a(field);
+		m_fields.push_back(a);
 	}
 
-	std::string print(int indent) const
-	{
-		std::stringstream out;
-		auto ind = [indent, &out] () {
-			for (int i = 0; i < indent; i++) out << "\t";
-		};
-
-		ind(); out << "enum " << name() << " {\n";
-		for (auto &&field : m_contents) {
-			ind(); out << "\t" << field->name() << " = " << field->value() << ",\n";
-		}
-		ind(); out << "}\n";
-		std::cout << out.str();
-		return out.str();
-	}
+	const std::list<field_type> &fields() const { return m_fields; }
 };
 
 class Message : public Universal {
 	typedef std::shared_ptr<Universal> contents_type;
 	std::list<contents_type> m_contents;
 	std::string m_name;
+	Message *m_parent;
 
 public:
 	Message()
 		: Universal(Universal::message)
+		, m_parent(nullptr)
 	{
 	}
 	virtual ~Message()
 	{
 		std::list<contents_type>::const_iterator it = m_contents.begin();
 	}
+
+	void setParent(Message *parent)
+	{
+		m_parent = parent;
+	}
+
+	Message *parent() const { return m_parent; }
 
 	void setName(const std::string &name)
 	{
@@ -196,21 +191,5 @@ public:
 		contents_type a(content);
 		m_contents.push_back(a);
 	}
-
-	std::string print()
-	{
-		using namespace std;
-		cout << "struct " << name() << " {\n";
-		for (auto &&it : m_contents) {
-			if (it->type() == Universal::genericVariable) {
-				const GenericVariable *var = dynamic_cast<GenericVariable*>(it.get());
-				cout << "\t" << var->value() << ": " << var->type() << " " << var->name() << ",\n";
-			} else if (it->type() == Universal::enum_) {
-				const Enum *var = dynamic_cast<Enum*>(it.get());
-				var->print(1);
-			}
-		}
-		cout << "}\n";
-		return std::string();
-	}
+	const std::list<contents_type> &contents() const {return m_contents; }
 };

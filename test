@@ -3,11 +3,12 @@ enum childMessage
 {
 	whatever = 1;
 	omg = 2;
+	what = 4;
 }
 
 message numbers
 {
-	enum childMessage
+	enum childMessage1
 	{
 		whatever = 1;
 		omg = 2;
@@ -20,7 +21,7 @@ message numbers
 
 message parentMessage
 {
-	message childMessage {
+	message childMessage1 {
 		string whatever = 1;
 		string omg = 2;
 	}

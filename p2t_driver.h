@@ -32,11 +32,31 @@
 #include "p2t_parser.y.hh"
 
 class p2t_driver {
+	std::list<std::shared_ptr<Enum> > m_enums;
+	std::list<std::shared_ptr<Message> > m_messages;
+
 public:
 	p2t_driver();
 	virtual ~p2t_driver();
+	class Printer {
+		int m_indent;
+		std::ostream &m_out;
+
+		void indent();
+		void print(GenericVariable *variable);
+		void print(Universal *universal);
+		void print(EnumField *field);
+	public:
+		Printer(std::ostream &out);
+		void print(Message *message);
+		void print(Enum *enum_);
+	};
+
 	int parse(const std::string &f);
 	static const std::map<std::string, std::string>  &typeMap();
+	void addMessage(Message* message);
+	void addEnum(Enum *enum_);
+	int output(std::ostream &out);
 };
 
 class p2t_scanner : public yyFlexLexer {
@@ -50,5 +70,4 @@ public:
 
 private:
 	yy::p2t_parser::symbol_type processName(const char *name);
-	yy::p2t_parser::semantic_type *yylval;
 };

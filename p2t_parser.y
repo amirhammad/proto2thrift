@@ -73,13 +73,14 @@ file:
 |	file "message" NAME "{" contents "}"
 	{
 		$contents->setName($NAME);
-		$contents->print();
+		driver.addMessage($contents);
 	}
 |	file "enum" NAME "{" enum_fields "}"
 	{
 		$enum_fields->setName($NAME);
-		$enum_fields->print(0);
+		driver.addEnum($enum_fields);
 	}
+|	file error { return 121; }
 ;
 
 contents: { $$ = new Message(); }
@@ -98,6 +99,14 @@ contents: { $$ = new Message(); }
 		$c2->setName($NAME);
 		$$->addContent($c2);
 	}
+|	contents "message" NAME "{" contents[c2] "}"
+	{
+		$$ = $1;
+		$c2->setName($NAME);
+		$c2->setParent($$);
+		$$->addContent($c2);
+	}
+| contents error { delete $1; return 122; }
 ;
 
 enum_fields: { $$ = new Enum(); }
@@ -109,6 +118,7 @@ enum_fields: { $$ = new Enum(); }
 	field->setValue($NUMBER);
 	$$->addField(field);
 }
+|	enum_fields error { delete $1; return 123; }
 ;
 
 %%
@@ -130,7 +140,11 @@ int main(int argc, char const *argv[])
 	yy::p2t_parser parser(scanner, driver);
 /*	scanner.set_debug(1);*/
 /*	parser.set_debug_level(1);*/
-	return parser.parse();
+	int ret = parser.parse();
+	if (driver.output(std::cout)) {
+		std::cerr << "Error printing out " << std::endl;
+	}
+	return ret;
 	        
 /*	driver.parse(argv[0]);*/
 	return 0;

@@ -23,6 +23,7 @@
 #include "p2t_parser.y.hh"
 #include "api.h"
 #include <string>
+#include <set>
 
 p2t_driver::p2t_driver()
 {
@@ -60,10 +61,45 @@ const std::map<std::string, std::string> &p2t_driver::typeMap()
 		{"sfixed64", "i64"},
 		{"bool", "bool"},
 		{"string", "string"},
-		{"bytes", "bytes"},
+		{"bytes", "string"},
 	};
 	return a;
 }
+
+void p2t_driver::addMessage(Message *message)
+{
+	std::shared_ptr<Message> a(message);
+	m_messages.push_back(a);
+}
+
+void p2t_driver::addEnum(Enum *enum_)
+{
+	std::shared_ptr<Enum> a(enum_);
+	m_enums.push_back(a);
+}
+
+int p2t_driver::output(std::ostream &out)
+{
+	std::set<std::string> knownTypes;
+	std::stringstream ss;
+	for (auto &&en : m_enums) {
+		if (knownTypes.insert(en->name()).second == false) {
+			std::cerr << "Duplicate type: " << en->name() << std::endl;
+			return 1;
+		}
+		Printer(out).print(en.get());
+	}
+
+	for (auto &&msg : m_messages) {
+		if (knownTypes.insert(msg->name()).second == false) {
+			std::cerr << "Duplicate type: " << msg->name() << std::endl;
+			return 1;
+		}
+		Printer(out).print(msg.get());
+	}
+	return 0;
+}
+
 yy::p2t_parser::symbol_type p2t_scanner::processName(const char *name)
 {
 	auto a = p2t_driver::typeMap().find(name);
@@ -71,4 +107,67 @@ yy::p2t_parser::symbol_type p2t_scanner::processName(const char *name)
 		return yy::p2t_parser::make_TYPE(a->second);
 	}
 	return yy::p2t_parser::make_NAME(name);
+}
+
+
+void p2t_driver::Printer::print(Message *message)
+{
+	indent(); m_out << "struct " << message->name() << " {\n";
+	for (auto &&content : message->contents()) {
+		print(content.get());
+	}
+	indent(); m_out << "}\n";
+}
+
+void p2t_driver::Printer::print(GenericVariable *var)
+{
+	indent(); m_out << var->value() << ": " << var->type() << " " << var->name() << ",\n";
+}
+
+void p2t_driver::Printer::print(Enum *enum_)
+{
+	indent(); m_out << "enum " << enum_->name() << " {\n";
+	for (auto &&field : enum_->fields()) {
+		print(field.get());
+	}
+	indent(); m_out << "}\n";
+}
+
+void p2t_driver::Printer::print(EnumField *field)
+{
+	indent(); m_out << field->name() << " = " << field->value() << ",\n";
+}
+
+void p2t_driver::Printer::indent()
+{
+	for (int i = 0; i < m_indent; i++) {
+		m_out << '\t';
+	}
+}
+
+p2t_driver::Printer::Printer(std::ostream &out)
+	: m_indent(0)
+	, m_out(out)
+{
+
+}
+
+void p2t_driver::Printer::print(Universal *universal)
+{
+	m_indent++;
+	switch (universal->type()) {
+	case Universal::enum_:
+		print(dynamic_cast<Enum *>(universal));
+		break;
+	case Universal::message:
+		print(dynamic_cast<Message *>(universal));
+		break;
+	case Universal::genericVariable:
+		print(dynamic_cast<GenericVariable *>(universal));
+		break;
+	case Universal::enumField:
+		print(dynamic_cast<EnumField *>(universal));
+		break;
+	}
+	m_indent--;
 }
