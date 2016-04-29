@@ -33,6 +33,8 @@
 %%
 "message"	{ return yy::p2t_parser::make_MESSAGE(); }
 "enum"	{ return yy::p2t_parser::make_ENUM(); }
+"optional"	{ return yy::p2t_parser::make_OPTIONAL(); }
+"required"	{ return yy::p2t_parser::make_REQUIRED(); }
 "{"	{ return yy::p2t_parser::make_LBRACE(); }
 "}"	{ return yy::p2t_parser::make_RBRACE(); }
 "="	{ return yy::p2t_parser::make_EQUAL(); }

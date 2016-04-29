@@ -13,8 +13,8 @@ message numbers
 		whatever = 1;
 		omg = 2;
 	}
-	uint32 a = 1;
-	uint64 b = 2;
+	optional uint32 a = 1;
+	required uint64 b = 2;
 	uint64 c = 016;
 	string c = 0x1f;
 }

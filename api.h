@@ -94,6 +94,8 @@ public:
 		m_value = value;
 	}
 	int value() const { return m_value; }
+
+	PresenceType presenceType() const { return m_presenceType; }
 };
 
 

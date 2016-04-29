@@ -59,9 +59,12 @@ class p2t_driver;
 %token EQUAL "="
 %token MESSAGE "message"
 %token ENUM "enum"
+%token REQUIRED "required"
+%token OPTIONAL "optional"
 %token <std::string> NAME
 %type <Message *> contents
 %type <Enum *> enum_fields
+%type <GenericVariable::PresenceType> presence
 
 %left '+' '-'
 %left '*' '/'
@@ -84,10 +87,10 @@ file:
 ;
 
 contents: { $$ = new Message(); }
-|	contents TYPE NAME "=" NUMBER ";"
+|	contents presence TYPE NAME "=" NUMBER ";"
 	{
 		$$ = $1;
-		GenericVariable *var = new GenericVariable();
+		GenericVariable *var = new GenericVariable($presence);
 		var->setType($TYPE);
 		var->setName($NAME);
 		var->setValue($NUMBER);
@@ -107,6 +110,17 @@ contents: { $$ = new Message(); }
 		$$->addContent($c2);
 	}
 | contents error { delete $1; return 122; }
+;
+
+presence: { $$ = GenericVariable::none; }
+|	presence "optional"
+	{
+		$$ = GenericVariable::optional;
+	}
+|	presence "required"
+	{
+		$$ = GenericVariable::required;
+	}
 ;
 
 enum_fields: { $$ = new Enum(); }

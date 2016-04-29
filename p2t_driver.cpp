@@ -121,7 +121,12 @@ void p2t_driver::Printer::print(Message *message)
 
 void p2t_driver::Printer::print(GenericVariable *var)
 {
-	indent(); m_out << var->value() << ": " << var->type() << " " << var->name() << ",\n";
+	indent(); m_out << var->value() << ": " ;
+	if (var->presenceType() != GenericVariable::none) {
+		m_out << var->presenceTypeString() << " ";
+	}
+	m_out << var->type() << " " << var->name();
+	m_out << ",\n";
 }
 
 void p2t_driver::Printer::print(Enum *enum_)
