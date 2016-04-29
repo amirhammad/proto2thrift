@@ -26,3 +26,12 @@ message parentMessage
 		string omg = 2;
 	}
 }
+
+message oneOfMessage
+{
+	oneof childMessag1 {
+		string whatever = 1;
+		string omg = 2;
+	}
+	optional childMessag1 o = 1;
+}

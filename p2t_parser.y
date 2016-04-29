@@ -59,6 +59,7 @@ class p2t_driver;
 %token EQUAL "="
 %token MESSAGE "message"
 %token ENUM "enum"
+%token ONEOF "oneof"
 %token REQUIRED "required"
 %token OPTIONAL "optional"
 %token <std::string> NAME
@@ -109,7 +110,14 @@ contents: { $$ = new Message(); }
 		$c2->setParent($$);
 		$$->addContent($c2);
 	}
-| contents error { delete $1; return 122; }
+|	contents "oneof" NAME "{" contents[c2] "}"
+	{
+		$$ = $1;
+		$c2->setName($NAME);
+		$c2->setParent($$);
+		$$->addContent($c2);
+	}
+|	contents error { delete $1; return 122; }
 ;
 
 presence: { $$ = GenericVariable::none; }
@@ -122,6 +130,17 @@ presence: { $$ = GenericVariable::none; }
 		$$ = GenericVariable::required;
 	}
 ;
+/*oneof_fields: { $$ = new OneOf(); }
+|	oneof_fields TYPE NAME "=" NUMBER ";"
+	{
+		$$ = $1;
+		EnumField *field = new EnumField();
+		field->setName($NAME);
+		field->setType($NAME);
+		$$->addField(field);
+	}
+|	oneof_fields error { delete $1; return 124; }
+;*/
 
 enum_fields: { $$ = new Enum(); }
 |	enum_fields NAME "=" NUMBER ";"

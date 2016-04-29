@@ -33,6 +33,7 @@
 %%
 "message"	{ return yy::p2t_parser::make_MESSAGE(); }
 "enum"	{ return yy::p2t_parser::make_ENUM(); }
+"oneof"	{ return yy::p2t_parser::make_ONEOF(); }
 "optional"	{ return yy::p2t_parser::make_OPTIONAL(); }
 "required"	{ return yy::p2t_parser::make_REQUIRED(); }
 "{"	{ return yy::p2t_parser::make_LBRACE(); }

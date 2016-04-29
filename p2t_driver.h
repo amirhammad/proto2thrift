@@ -66,7 +66,7 @@ public:
 	{
 	}
 
-	yy::p2t_parser::symbol_type yylex (p2t_driver& driver);
+	yy::p2t_parser::symbol_type yylex(p2t_driver& driver);
 
 private:
 	yy::p2t_parser::symbol_type processName(const char *name);
